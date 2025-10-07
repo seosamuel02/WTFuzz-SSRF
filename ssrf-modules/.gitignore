@@ -1,15 +1,12 @@
-# Python virtual environment
-venv/
-env/
-ENV/
+# 제외할 파일들
+.claude/
+.mcp.json
 
-# Python cache files
+# Python 캐시
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-
-# Distribution / packaging
+*.pyc
+*.pyo
+*.pyd
 .Python
 build/
 develop-eggs/
@@ -23,32 +20,11 @@ parts/
 sdist/
 var/
 wheels/
-share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
-# PyInstaller
-*.manifest
-*.spec
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-cover/
-
-# Environments
+# 환경 설정
 .env
 .venv
 env/
@@ -64,23 +40,12 @@ venv.bak/
 *.swo
 *~
 
-# OS
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Logs
+# 결과 파일
+*.json
+!**/config/*.json
 *.log
+*.out
 
-# Sensitive files
-*.key
-*.pem
-secrets.json
-config.json
-
-# MCP configuration with tokens
-.mcp.json
+# OS 특정
+.DS_Store
+Thumbs.db
